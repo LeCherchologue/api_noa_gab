@@ -12,7 +12,7 @@ class UsersSchema(BaseModel):
     tel : str
     adresse : str
     profil : str
-    password : str = Field(..., max_length=72)
+    password : str
 
 class UserOut(BaseModel):
 
