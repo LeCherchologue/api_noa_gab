@@ -15,7 +15,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 #------------------------------------requetes authentification--------------------------------#
 
 def hash_password(password):
-    return pwd_crypt.hash(password)
+    if not isinstance(password, str):
+        raise ValueError("Invalid password format")
+    cleaned = password.strip()[:72]
+    return pwd_crypt.hash(cleaned)
 
 def verify_password(plain_password, hashed_password):
     return pwd_crypt.verify(plain_password, hashed_password)
