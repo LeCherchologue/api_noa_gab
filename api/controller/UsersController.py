@@ -1,0 +1,103 @@
+
+from sqlalchemy.orm import Session
+from fastapi import UploadFile, HTTPException, status
+from ..model.UsersModel import Users
+from ..model import UsersModel
+from ..schema import UsersSchema
+
+from passlib.context import CryptContext
+
+pwd_crypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+#------------------------------------requetes authentification--------------------------------#
+
+def hash_password(password):
+    return pwd_crypt.hash(password)
+
+def verify_password(plain_password, hashed_password):
+    return pwd_crypt.verify(plain_password, hashed_password)
+
+def authenticate_user(db: Session, user: UsersSchema.UserAuthentication):
+    db_user = db.query(UsersModel.Users).filter(UsersModel.Users.email == user.email).first()
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email ou mot de passe incorrect"
+        )
+
+        # Vérification du mot de passe hashé
+    if not verify_password(user.password, db_user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email ou mot de passe incorrect"
+        )
+
+    return {
+        "detail": "success",
+        "user": {
+            "id": db_user.id,
+            "nom": db_user.nom,
+            "prenom": db_user.prenom,
+            "tel": db_user.tel,
+            "adresse": db_user.adresse,
+            "email": user.email,
+            "profil": db_user.profil
+        }
+    }
+
+
+
+#------------------------------------requetes crud users--------------------------------#
+
+def get_all_users(db: Session):
+    return db.query(UsersModel.Users).all()
+
+def create_users(db: Session, users: UsersSchema):
+
+    new_users = Users(
+        nom=users.nom,
+        prenom = users.prenom,
+        email = users.email,
+        tel = users.tel,
+        adresse = users.adresse,
+        profil = users.profil,
+        password = hash_password(users.password),
+    )
+
+    db.add(new_users)
+    db.commit()
+    db.refresh(new_users)
+
+    return {
+        "message": "users cree",
+        "detail": "success",
+        "users": new_users
+    }
+
+def update_users(db: Session, users_id: int, users: UsersSchema):
+
+    db_users = db.query(Users).filter(Users.id == users_id).first()
+    if not db_users:
+        raise HTTPException(status_code=404, detail="Users non trouvé")
+
+    for key, value in users.dict().items():
+        setattr(db_users, key, value)
+
+    db.commit()
+    db.refresh(db_users)
+
+    return {
+        "message": "users mis à jour avec succès",
+        "detail": "success",
+        "users": db_users
+    }
+
+def delete_users(db: Session, id: int):
+    del_users = db.query(Users).filter(Users.id == id).first()
+    if not del_users:
+        raise HTTPException(status_code=404, detail="Users non trouvé")
+    db.delete(del_users)
+    db.commit()
