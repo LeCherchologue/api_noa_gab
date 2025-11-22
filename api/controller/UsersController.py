@@ -14,11 +14,20 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 #------------------------------------requetes authentification--------------------------------#
 
-def hash_password(password):
+def hash_password(password: str):
     if not isinstance(password, str):
-        raise ValueError("Invalid password format")
-    cleaned = password.strip()[:72]
-    return pwd_crypt.hash(cleaned)
+        raise HTTPException(status_code=400, detail="Password must be a string")
+
+    password = password.strip()
+
+    if len(password) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Password trop long (max 72 characters)"
+        )
+
+    return pwd_crypt.hash(password)
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_crypt.verify(plain_password, hashed_password)
@@ -59,6 +68,7 @@ def get_all_users(db: Session):
     return db.query(UsersModel.Users).all()
 
 def create_users(db: Session, users: UsersSchema):
+    print("PASSWORD =", users.password, "LEN =", len(users.password))
 
     new_users = Users(
         nom=users.nom,

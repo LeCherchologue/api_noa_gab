@@ -12,7 +12,7 @@ class UsersSchema(BaseModel):
     tel : str
     adresse : str
     profil : str
-    password : str = Field(..., min_length=6, max_length=72)
+    password : str = Field(..., max_length=72)
 
 class UserAuthentication(BaseModel):
     email: str
