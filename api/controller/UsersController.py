@@ -14,23 +14,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 #------------------------------------requetes authentification--------------------------------#
 
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+
 def hash_password(password: str):
-    if not isinstance(password, str):
-        raise HTTPException(status_code=400, detail="Password must be a string")
-
-    password = password.strip()
-
-    if len(password) > 72:
-        raise HTTPException(
-            status_code=400,
-            detail="Password trop long (max 72 characters)"
-        )
-
-    return pwd_crypt.hash(password)
-
+    return pwd_context.hash(password)
 
 def verify_password(plain_password, hashed_password):
-    return pwd_crypt.verify(plain_password, hashed_password)
+    return pwd_context.verify(plain_password, hashed_password)
 
 def authenticate_user(db: Session, user: UsersSchema.UserAuthentication):
     db_user = db.query(UsersModel.Users).filter(UsersModel.Users.email == user.email).first()
