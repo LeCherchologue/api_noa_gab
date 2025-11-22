@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends,Form, UploadFile,File
 from api.bdd.connexion import SessionLocal
-from api.schema.UsersSchema import UsersSchema, UserAuthentication
+from api.schema.UsersSchema import UsersSchema, UserOut
 from api.controller import UsersController
 
 router = APIRouter()
@@ -16,7 +16,7 @@ def get_db():
 
 #--------------route authentification--------------------#
 @router.post("/login", tags=["authentification"])
-async def login(user: UserAuthentication):
+async def login(user: UserOut):
     db=SessionLocal()
     return UsersController.authenticate_user(db=db, user=user)
 

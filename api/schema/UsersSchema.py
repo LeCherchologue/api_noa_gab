@@ -14,6 +14,12 @@ class UsersSchema(BaseModel):
     profil : str
     password : str = Field(..., max_length=72)
 
-class UserAuthentication(BaseModel):
+class UserOut(BaseModel):
+
+    id: int
+    nom: str
+    prenom: str
     email: str
-    password: str
+    tel: str
+    adresse: str
+    profil: str
