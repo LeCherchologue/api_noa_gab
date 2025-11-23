@@ -23,20 +23,30 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def authenticate_user(db: Session, user: UsersSchema.UserAuth):
+    print(f"[LOGIN] Tentative de connexion pour: {user.email}")
+    
     db_user = db.query(UsersModel.Users).filter(UsersModel.Users.email == user.email).first()
     if not db_user:
+        print(f"[LOGIN] Utilisateur non trouvé: {user.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect"
         )
 
-        # Vérification du mot de passe hashé
-    if not verify_password(user.password, db_user.password):
+    print(f"[LOGIN] Utilisateur trouvé: {db_user.email}")
+    
+    # Vérification du mot de passe hashé
+    password_valid = verify_password(user.password, db_user.password)
+    print(f"[LOGIN] Vérification mot de passe: {password_valid}")
+    
+    if not password_valid:
+        print(f"[LOGIN] Mot de passe incorrect pour: {user.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect"
         )
 
+    print(f"[LOGIN] Connexion réussie pour: {user.email}")
     return {
         "detail": "success",
         "user": {
