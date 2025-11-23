@@ -22,7 +22,7 @@ def hash_password(password: str):
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-def authenticate_user(db: Session, user: UsersSchema.UsersSchema):
+def authenticate_user(db: Session, user: UsersSchema.UserAuth):
     db_user = db.query(UsersModel.Users).filter(UsersModel.Users.email == user.email).first()
     if not db_user:
         raise HTTPException(

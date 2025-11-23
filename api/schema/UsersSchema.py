@@ -23,3 +23,7 @@ class UserOut(BaseModel):
     tel: str
     adresse: str
     profil: str
+
+class UserAuth(BaseModel):
+    email: str
+    password: str
