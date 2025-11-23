@@ -14,6 +14,8 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 origins = [
     "https://noagab-mini-shop.vercel.app",
+    "capacitor://localhost",
+    "http://localhost",
 ]
 
 app.add_middleware(
