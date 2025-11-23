@@ -15,6 +15,11 @@ def get_db():
 
 
 #--------------route authentification--------------------#
+@router.options("/login", tags=["authentification"])
+async def login_options():
+    """Gère les requêtes OPTIONS pour CORS"""
+    return {}
+
 @router.post("/login", tags=["authentification"])
 async def login(user: UserAuth):
     db=SessionLocal()
