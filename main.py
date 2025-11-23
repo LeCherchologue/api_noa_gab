@@ -14,15 +14,16 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 origins = [
     "https://noagab-mini-shop.vercel.app",
-    "capacitor://localhost",
-    "http://localhost",
+    "capacitor://localhost",  # Android / iOS
+    "http://localhost",        # dev browser
+    "http://localhost:8100",   # live reload Ionic
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["POST", "GET", "PUT", "DELETE"],
+    allow_methods=["*"],       # inclut OPTIONS automatiquement
     allow_headers=["*"],
 )
 
