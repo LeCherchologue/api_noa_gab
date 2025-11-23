@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends,Form, UploadFile,File
+from fastapi.responses import Response
 from api.bdd.connexion import SessionLocal
 from api.schema.UsersSchema import UsersSchema, UserOut,UserAuth
 from api.controller import UsersController
@@ -18,7 +19,7 @@ def get_db():
 @router.options("/login", tags=["authentification"])
 async def login_options():
     """Gère les requêtes OPTIONS pour CORS"""
-    return {}
+    return Response(status_code=200)
 
 @router.post("/login", tags=["authentification"])
 async def login(user: UserAuth):
