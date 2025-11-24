@@ -18,6 +18,7 @@ origins = [
     "http://127.0.0.1:8100",
     "http://10.0.2.2",  # Émulateur Android
     "http://debugger.alwaysdata.net",
+    "https://debugger.alwaysdata.net",
 ]
 
 app.add_middleware(
