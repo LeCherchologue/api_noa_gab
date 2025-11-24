@@ -14,10 +14,10 @@ origins = [
     "http://localhost",
     "http://localhost:8100",  # Port par défaut d'Ionic
     "http://localhost:8080",
-    "http://127.0.0.1",
+    "http://127.0.0.1:8000",
     "http://127.0.0.1:8100",
     "http://10.0.2.2",  # Émulateur Android
-    "http://10.0.2.2:8000",
+    "http://debugger.alwaysdata.net",
 ]
 
 app.add_middleware(
@@ -27,7 +27,7 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all methods including OPTIONS
     allow_headers=["*"],
     expose_headers=["*"],
-    max_age=3600,  # Cache preflight requests for 1 hour
+
 )
 
 # Mount static files after CORS middleware
