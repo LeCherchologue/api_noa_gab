@@ -73,7 +73,7 @@ def authenticate_user(db: Session, user: UsersSchema.UserAuth):
 def get_all_users(db: Session):
     return db.query(UsersModel.Users).all()
 
-def create_users(db: Session, users: UsersSchema):
+def create_users(db: Session, users: UsersSchema.UsersSchema):
     print("PASSWORD =", users.password, "LEN =", len(users.password))
 
     new_users = Users(
@@ -85,7 +85,7 @@ def create_users(db: Session, users: UsersSchema):
         profil = users.profil,
         password = hash_password(users.password),
     )
-
+    print(new_users)
     db.add(new_users)
     db.commit()
     db.refresh(new_users)
@@ -95,6 +95,7 @@ def create_users(db: Session, users: UsersSchema):
         "detail": "success",
         "users": new_users
     }
+
 
 def update_users(db: Session, users_id: int, users: UsersSchema):
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 class Parametres:
     PROJECT_NAME: str = "api-noabag"
     PROJECT_VERSION: str = "0.0.0"
-    DATABASE_URL: str = "mysql+pymysql://debugger:emore291961@mysql-debugger.alwaysdata.net:3306/debugger_noagab"
+    DATABASE_URL: str = "mysql+pymysql://442597:emore291961@mysql-test-projet.alwaysdata.net:3306/test-projet_noa"
 
 parametres = Parametres()
 
