@@ -11,7 +11,7 @@ class Produits(Base):
     categorie = Column(String(255))
     description = Column(String(255))
     statut = Column(String(255))
-    quantite = Column(String(255))
+    quantite = Column(Integer)
     images = Column(String(255))
     created_at = Column(DateTime, default=func.now(), nullable=False)
     updated_at = Column(DateTime, default=func.now(), nullable=False)

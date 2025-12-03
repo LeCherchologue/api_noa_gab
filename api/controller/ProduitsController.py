@@ -42,7 +42,7 @@ def create_produits(
     relative_path = f"uploads/produits/{filename}"
 
     # URL publique accessible
-    image_url = f"https://api-noa-gab.onrender.com/{relative_path}"
+    image_url = f"http://127.0.0.1:8000/{relative_path}"
 
     new_produits = Produits(
         nom=nom,

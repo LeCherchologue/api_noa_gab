@@ -7,4 +7,5 @@ pydantic
 python-dotenv
 passlib[bcrypt]
 passlib[argon2]
+python-jose
 

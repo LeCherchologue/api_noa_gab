@@ -11,5 +11,5 @@ class ProduitsSchema(BaseModel):
     categorie : str
     description : str
     statut : str
-    quantite : str
+    quantite : int
     images : str
