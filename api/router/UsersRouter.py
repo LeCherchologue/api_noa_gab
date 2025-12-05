@@ -23,7 +23,7 @@ async def login(user: UserAuth):
 
 #--------------route Users--------------------#
 
-@router.get("/users" , tags=["users"], response_model=list[UsersSchema])
+@router.get("/users" , tags=["users"], response_model=list[UserOut])
 async def get_users():
     return UsersController.get_all_users(db=SessionLocal())
 
@@ -33,7 +33,7 @@ async def create_users(users: UsersSchema):
     return UsersController.create_users(db=db, users=users)
 
 @router.put("/users/{id}", tags=["users"])
-async def update_users(id: int, users: UsersSchema):
+async def update_users(id: int, users: UserOut):
     db=SessionLocal()
     return UsersController.update_users(db=db, users=users, users_id=id)
 
