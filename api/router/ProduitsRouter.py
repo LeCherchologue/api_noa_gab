@@ -1,13 +1,18 @@
+from typing import Generator
+
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends,Form, UploadFile,File
 from api.bdd.connexion import SessionLocal
+from api.bdd.security import get_current_user
 from api.schema.ProduitsSchema import ProduitsSchema
 from api.controller import ProduitsController
 
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(get_current_user)]
+)
 
-def get_db():
+def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
@@ -17,12 +22,11 @@ def get_db():
 #--------------route Produits--------------------#
 
 @router.get("/produits" , tags=["produits"], response_model=list[ProduitsSchema])
-async def get_produits():
-    return ProduitsController.get_all_produits(db=SessionLocal())
+async def get_produits(db: Session = Depends(get_db)):
+    return ProduitsController.get_all_produits(db=db)
 
 @router.post("/produits/{id}", tags=["produits"])
-async def get_one_produit(id: int):
-    db=SessionLocal()
+async def get_one_produit(id: int, db: Session = Depends(get_db)):
     return ProduitsController.one_produit(db=db, produits_id=id)
 
 @router.post("/produits", tags=["produits"])
@@ -33,9 +37,10 @@ async def create_produits(
         description: str = Form(...),
         statut: str = Form(...),
         quantite: str = Form(...),
-        images: UploadFile = File(...)
+        images: UploadFile = File(...),
+        db: Session = Depends(get_db)
 ):
-    db=SessionLocal()
+
     return ProduitsController.create_produits(
         db=db,
         nom=nom,
@@ -49,12 +54,10 @@ async def create_produits(
     )
 
 @router.put("/produits/{id}", tags=["produits"])
-async def update_produits(id: int, produits: ProduitsSchema):
-    db=SessionLocal()
+async def update_produits(id: int, produits: ProduitsSchema, db: Session = Depends(get_db)):
     return ProduitsController.update_produits(db=db, produits=produits, produits_id=id)
 
 @router.delete("/produits/{id}", tags=["produits"])
-async def delete_produits(id: int):
-    db=SessionLocal()
+async def delete_produits(id: int, db: Session = Depends(get_db)):
     return ProduitsController.delete_produits(db=db, id=id)
 

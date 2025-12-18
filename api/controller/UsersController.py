@@ -1,6 +1,8 @@
-
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from fastapi import UploadFile, HTTPException, status
+
+from ..bdd.security import create_access_token
 from ..model.UsersModel import Users
 from ..model import UsersModel
 from ..schema import UsersSchema
@@ -11,6 +13,7 @@ pwd_crypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
 
 #------------------------------------requetes authentification--------------------------------#
 
@@ -23,50 +26,44 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def authenticate_user(db: Session, user: UsersSchema.UserAuth):
-    db_user = db.query(UsersModel.Users).filter(
-        UsersModel.Users.email == user.email
+def authenticate_user(db: Session, form_data: OAuth2PasswordRequestForm):
+    db_user = db.query(Users).filter(
+        Users.email == form_data.username
     ).first()
 
     if not db_user:
-        print(f"[LOGIN] Utilisateur non trouvé: {user.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect"
         )
 
-    print(f"[LOGIN] Utilisateur trouvé: {db_user.email}")
-
-    # Vérification du mot de passe
-    password_valid = verify_password(user.password, db_user.password)
-    print(f"[LOGIN] Vérification mot de passe: {password_valid}")
-
-    if not password_valid:
-        print(f"[LOGIN] Mot de passe incorrect pour: {user.email}")
+    if not verify_password(form_data.password, db_user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect"
         )
 
-    
-
-    print(f"[LOGIN] Connexion réussie pour: {user.email}")
+    token = create_access_token({
+        "user_id": db_user.id,
+        "email": db_user.email,
+        "profil": db_user.profil
+    })
 
     return {
         "success": True,
         "message": "Connexion réussie",
+        "access_token": token,
+        "token_type": "bearer",
         "data": {
             "id": db_user.id,
             "nom": db_user.nom,
             "prenom": db_user.prenom,
             "tel": db_user.tel,
             "adresse": db_user.adresse,
-            "email": db_user.email,  # CORRIGÉ
+            "email": db_user.email,
             "profil": db_user.profil,
-
         }
     }
-
 
 #------------------------------------requetes crud users--------------------------------#
 
