@@ -35,14 +35,14 @@ async def get_users(db: Session = Depends(get_db), user_id: int = Depends(get_cu
     return UsersController.get_all_users(db=db)
 
 @router.post("/users", tags=["users"])
-async def create_users(users: UsersSchema, db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
+async def create_users(users: UsersSchema, db: Session = Depends(get_db)):
     return UsersController.create_users(db=db, users=users)
 
 @router.put("/users/{id}", tags=["users"])
-async def update_users(id: int, users: UserOut, db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
+async def update_users(id: int, users: UserOut, db: Session = Depends(get_db)):
     return UsersController.update_users(db=db, users=users, users_id=id)
 
 @router.delete("/users/{id}", tags=["users"])
-async def delete_users(id: int, db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
+async def delete_users(id: int, db: Session = Depends(get_db)):
     return UsersController.delete_users(db=db, id=id)
 
