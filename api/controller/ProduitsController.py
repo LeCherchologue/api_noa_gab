@@ -1,7 +1,10 @@
 import os
+import uuid
 
 from sqlalchemy.orm import Session
-from fastapi import UploadFile, HTTPException, Form, File
+from fastapi import UploadFile, HTTPException, Form, File, Request
+
+from .upload import upload_image_to_render
 from ..model.ProduitsModel import Produits
 from ..model import ProduitsModel
 from ..schema import ProduitsSchema
@@ -15,54 +18,92 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def get_all_produits(db: Session):
     return db.query(ProduitsModel.Produits).all()
 
-def create_produits(
-        db: Session,
-        nom: str = Form(...),
-        prix: str = Form(...),
-        categorie: str = Form(...),
-        description: str = Form(...),
-        statut: str = Form(...),
-        quantite: str = Form(...),
-        images: UploadFile = File(...)
-    ):
+# def create_produits(
+#         db: Session,
+#         nom: str = Form(...),
+#         prix: str = Form(...),
+#         categorie: str = Form(...),
+#         description: str = Form(...),
+#         statut: str = Form(...),
+#         quantite: str = Form(...),
+#         images: UploadFile = File(...)
+#     ):
+#     if not images.content_type.startswith("image/"):
+#         raise HTTPException(
+#             status_code=400,
+#             detail="Format non supporté : image uniquement"
+#         )
+#     filename = f"produit_{nom}_{images.filename}"
+#     upload_dir = "uploads/produits"
+#     os.makedirs(upload_dir, exist_ok=True)
+#     file_path = os.path.join(upload_dir, filename)
+#
+#     with open(file_path, "wb") as buffer:
+#         buffer.write(images.file.read())
+#
+#         # Chemin relatif pour la DB
+#     relative_path = f"uploads/produits/{filename}"
+#
+#     # URL publique accessible
+#     image_url = f"http://127.0.0.1:8000/{relative_path}"
+#
+#     new_produits = Produits(
+#         nom=nom,
+#         prix = prix,
+#         categorie = categorie,
+#         description = description,
+#         statut = statut,
+#         quantite = quantite,
+#         images = relative_path,
+#     )
+#
+#     db.add(new_produits)
+#     db.commit()
+#     db.refresh(new_produits)
+#
+#
+#     return {
+#         "message": "Produit créé",
+#         "produit": new_produits,
+#         "image_url": image_url
+#     }
+
+async def create_produits(
+    db,
+    nom: str = Form(...),
+    prix: str = Form(...),
+    categorie: str = Form(...),
+    description: str = Form(...),
+    statut: str = Form(...),
+    quantite: int = Form(...),
+    images: UploadFile = File(...),
+    request: Request = None
+):
     if not images.content_type.startswith("image/"):
-        raise HTTPException(
-            status_code=400,
-            detail="Format non supporté : image uniquement"
-        )
-    filename = f"produit_{nom}_{images.filename}"
-    upload_dir = "uploads/produits"
-    os.makedirs(upload_dir, exist_ok=True)
-    file_path = os.path.join(upload_dir, filename)
+        raise HTTPException(status_code=400, detail="Image uniquement")
 
-    with open(file_path, "wb") as buffer:
-        buffer.write(images.file.read())
+    ext = images.filename.split(".")[-1]
+    filename = f"produit_{uuid.uuid4()}.{ext}"
 
-        # Chemin relatif pour la DB
-    relative_path = f"uploads/produits/{filename}"
+    image_url = await upload_image_to_render(images, filename, request)
 
-    # URL publique accessible
-    image_url = f"http://127.0.0.1:8000/{relative_path}"
-
-    new_produits = Produits(
+    new_produit = Produits(
         nom=nom,
-        prix = prix,
-        categorie = categorie,
-        description = description,
-        statut = statut,
-        quantite = quantite,
-        images = relative_path,
+        prix=prix,
+        categorie=categorie,
+        description=description,
+        statut=statut,
+        quantite=quantite,
+        images=image_url
     )
 
-    db.add(new_produits)
+    db.add(new_produit)
     db.commit()
-    db.refresh(new_produits)
-
+    db.refresh(new_produit)
 
     return {
-        "message": "Produit créé",
-        "produit": new_produits,
-        "image_url": image_url
+        "success": True,
+        "produit": new_produit
     }
 
 def update_produits(db: Session, produits_id: int, produits: ProduitsSchema):

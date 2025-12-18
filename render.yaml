@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: api-noa-gab
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      # Ajoutez vos variables d'environnement ici
+      # - key: DATABASE_URL
+      #   value: votre_url_de_base_de_donnees
+      # - key: BASE_URL
+      #   value: https://votre-app.onrender.com
+

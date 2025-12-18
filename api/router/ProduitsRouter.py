@@ -1,7 +1,7 @@
 from typing import Generator
 
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends,Form, UploadFile,File
+from fastapi import APIRouter, Depends, Form, UploadFile, File, Request
 from api.bdd.connexion import SessionLocal
 from api.bdd.security import get_current_user
 from api.schema.ProduitsSchema import ProduitsSchema
@@ -31,17 +31,18 @@ async def get_one_produit(id: int, db: Session = Depends(get_db)):
 
 @router.post("/produits", tags=["produits"])
 async def create_produits(
+        request: Request,
         nom: str = Form(...),
         prix: str = Form(...),
         categorie: str = Form(...),
         description: str = Form(...),
         statut: str = Form(...),
-        quantite: str = Form(...),
+        quantite: int = Form(...),
         images: UploadFile = File(...),
         db: Session = Depends(get_db)
 ):
 
-    return ProduitsController.create_produits(
+    return await ProduitsController.create_produits(
         db=db,
         nom=nom,
         prix=prix,
@@ -50,7 +51,7 @@ async def create_produits(
         statut=statut,
         quantite=quantite,
         images=images,
-
+        request=request
     )
 
 @router.put("/produits/{id}", tags=["produits"])

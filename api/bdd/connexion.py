@@ -9,8 +9,8 @@ from typing import Generator
 class Parametres:
     PROJECT_NAME: str = "api-noabag"
     PROJECT_VERSION: str = "0.0.0"
-    DATABASE_URL: str = "mysql+pymysql://444105:emore291961@mysql-proddebugger.alwaysdata.net:3306/proddebugger_noagab"
-    #DATABASE_URL: str = "mysql+pymysql://root@localhost:3306/bdd-noa"
+    #DATABASE_URL: str = "mysql+pymysql://444105:emore291961@mysql-proddebugger.alwaysdata.net:3306/proddebugger_noagab"
+    DATABASE_URL: str = "mysql+pymysql://root@localhost:3306/bdd-noa"
 
 parametres = Parametres()
 
